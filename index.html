@@ -1,0 +1,145 @@
+<html lang="en">
+   <head>
+      <title> Gabriel Sandoval </title>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+      <script src="https://cdn.plot.ly/plotly-2.3.0.min.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+      <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+      <link rel="stylesheet" type="text/css" href="assets/css/navigation.css">
+   </head>
+   <body class="container">
+      <section class="navigation">
+         <div class="topnav">
+            <a class="active" href="index.html">Home</a>
+            <a href="#">News</a>
+            <a href="#">About</a>
+         </div>
+      </section>
+      <section class="content">
+         <h1> Aggregated Stock Exchange </h1>
+         <div class="aggregated" id="line-chart"></div>
+         <div class="markets">
+            <h1> NASDAQ markets </h1>
+            <table id="NASDAQ" class="display nowrap" style="width:100%">
+               <thead>
+                  <tr>
+                     <td>Name</td>
+                     <td>Date</td>
+                     <td>Open Price</td>
+                     <td>Close Price</td>
+                     <td>High Price</td>
+                     <td>Low Price</td>
+                     <td>Volume</td>
+                     <td>Market</td>
+                  </tr>
+               </thead>
+               <tbody></tbody>
+            </table>
+            <h1> NYSE markets </h1>
+            <table id="NYSE" class="display nowrap" style="width:100%">
+               <thead>
+                  <tr>
+                     <td>Name</td>
+                     <td>Date</td>
+                     <td>Open Price</td>
+                     <td>Close Price</td>
+                     <td>High Price</td>
+                     <td>Low Price</td>
+                     <td>Volume</td>
+                     <td>Market</td>
+                  </tr>
+               </thead>
+               <tbody></tbody>
+            </table>
+         </div>
+      </section>
+   </body>
+   <script>
+      function plotLineChart() {
+        d3.csv('data/aggregated_stock_exchange.csv', function(rows, err) {
+          return {
+            x: rows['date'],
+            total_rev: +rows['total_rev'],
+            total_vol: +rows['total_vol']
+          }
+        }).then(function(data) {
+          function unpack(rows, key) {
+            return rows.map(function(row) {
+              return row[key];
+            });
+          }
+
+          var trace1 = {
+            x: unpack(data, 'x'),
+            y: unpack(data, 'total_rev'),
+            type: 'scatter',
+            name: 'Total Revenue'
+          };
+
+          var trace2 = {
+            x: unpack(data, 'x'),
+            y: unpack(data, 'total_vol'),
+            type: 'scatter',
+            name: 'Total Volume'
+          };
+
+          var data = [trace1, trace2];
+
+          var layout = {
+            height: 300,
+            yaxis: {
+              type: 'log',
+              autorange: true,
+              // exponentformat: 'e',
+              // showexponent: 'all'
+            }
+          };
+
+          Plotly.newPlot('line-chart', data, layout);
+        })
+      }
+
+      function buildTable(market) {
+        const table = document.querySelector(`table#${market}`)
+
+        $(table).DataTable( {
+          ajax: {
+            url: `data/${market}_market.json`,
+            dataSrc: ""
+          },
+          columns: [
+            { data: "name" },
+            { data: "date" },
+            { data: "open_price" },
+            { data: "close_price" },
+            { data: "high_price" },
+            { data: "low_price" },
+            { data: "volume" },
+            { data: "market" }
+          ],
+          createdRow: function ( row, data, index ) {
+            row.dataset.href = `show.html?market=${market}&stock=${data.name}`
+            row.className = "clickable-row"
+            row.onclick = function(){
+              window.location.href = this.dataset.href;
+            }
+          },
+          dom: 'Bfrtip',
+          buttons: ['csv', 'excel', 'pdf', 'print']
+        });
+      }
+
+      plotLineChart();
+      buildTable('NASDAQ');
+      buildTable('NYSE');
+   </script>
+</html>
