@@ -1,0 +1,5 @@
+name,date,open_price,close_price,high_price,low_price,volume,market
+WEN,27-Dec-2011,5.37,5.42,5.31,5.4,2066100,NASDAQ
+WEN,28-Dec-2011,5.38,5.4,5.31,5.32,2252200,NASDAQ
+WEN,29-Dec-2011,5.35,5.42,5.33,5.37,997700,NASDAQ
+WEN,30-Dec-2011,5.38,5.4,5.32,5.36,1770500,NASDAQ

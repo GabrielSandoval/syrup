@@ -1,0 +1,4 @@
+name,date,open_price,close_price,high_price,low_price,volume,market
+PB,28-Dec-2011,41.19,41.19,40.15,40.17,242400,NYSE
+PB,29-Dec-2011,40.25,41.1,40.0,40.94,173900,NYSE
+PB,30-Dec-2011,40.82,41.0,40.2,40.35,182000,NYSE
